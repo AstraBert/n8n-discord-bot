@@ -1,0 +1,5 @@
+lint="ruff check --fix"
+format="ruff format"
+ty="ty check src/"
+run="n8n-discord-bot"
+create-coll="n8n-qdrant-collection"
