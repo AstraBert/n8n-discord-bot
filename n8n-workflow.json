@@ -1,0 +1,461 @@
+{
+  "name": "qdrant-demo",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "40dda4c5-bab5-4e10-b12f-0cbc998d5e35",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -560,
+        -48
+      ],
+      "id": "665e2622-4dc2-4b4f-85fd-a10fa98021fa",
+      "name": "Webhook",
+      "webhookId": "40dda4c5-bab5-4e10-b12f-0cbc998d5e35"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        160
+      ],
+      "id": "b31b7594-f16e-4222-899a-90f2b83a8219",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "YYBF29uIUNq8L0oA",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "type": "@n8n/mcp-registry.exa",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        160
+      ],
+      "id": "92059b89-3b2b-4fcc-af09-c4c4515a0df6",
+      "name": "Exa MCP",
+      "credentials": {
+        "exaMcpOAuth2Api": {
+          "id": "0umBTplIgubQhLut",
+          "name": "Exa account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "guildId": {
+          "__rl": true,
+          "value": "1229781627677442048",
+          "mode": "list",
+          "cachedResultName": "RepoServer",
+          "cachedResultUrl": "https://discord.com/channels/1229781627677442048"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1536295572011614228",
+          "mode": "list",
+          "cachedResultName": "test-n8n",
+          "cachedResultUrl": "https://discord.com/channels/1229781627677442048/1536295572011614228"
+        },
+        "message": "=Hey {{ $('Webhook').item.json.body.mention }}\n\nI finished task {{ $('Webhook').item.json.body.request_id }}!\n\nHere is your answer:\n\n{{ $json.output.length > 2000 ? $json.output.slice(0, 1995) + \"...\" : $json.output }}",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Did the agent response satisfy your original query?",
+              "fieldType": "radio",
+              "defaultValue": "Yes",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Please leave any feedback you might have on the agent's answer"
+            }
+          ]
+        },
+        "options": {
+          "messageButtonLabel": "Give feedback on this answer",
+          "limitWaitTime": {
+            "values": {
+              "resumeAmount": 45,
+              "resumeUnit": "minutes"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -48
+      ],
+      "id": "f51f0d43-144a-4ef3-966b-d162a56e600a",
+      "name": "Send message and wait for response",
+      "webhookId": "c9c1f8b0-473c-4b2a-9314-883c390ca9f2",
+      "credentials": {
+        "discordBotApi": {
+          "id": "f5OK3p9t4iIgpWmm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "search",
+        "operation": "queryPoints",
+        "collectionName": {
+          "__rl": true,
+          "value": "n8n-bot",
+          "mode": "list",
+          "cachedResultName": "n8n-bot"
+        },
+        "query": "={{ JSON.stringify($json.data[0].embedding) }}",
+        "scoreThreshold": 0.3,
+        "limit": 10,
+        "filter": "{\n  \"must\": [\n    {\"key\": \"success\", \"match\": {\"value\": false}}\n  ]\n}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        -48
+      ],
+      "id": "963e8a07-e05e-419d-909a-499cdb8add85",
+      "name": "Get Failures",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "b76tCwD9rZH4XqAI",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "input",
+              "value": "={{ $('Webhook').item.json.body.message }}"
+            },
+            {
+              "name": "model",
+              "value": "text-embedding-3-small"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -368,
+        -48
+      ],
+      "id": "d6afc950-8bf5-4d9f-a086-4409e6a013d0",
+      "name": "Embed Query",
+      "credentials": {
+        "openAiApi": {
+          "id": "YYBF29uIUNq8L0oA",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "search",
+        "operation": "queryPoints",
+        "collectionName": {
+          "__rl": true,
+          "value": "n8n-bot",
+          "mode": "list",
+          "cachedResultName": "n8n-bot"
+        },
+        "query": "={{ JSON.stringify($('Embed Query').item.json.data[0].embedding) }}",
+        "scoreThreshold": 0.3,
+        "limit": 10,
+        "filter": "{\n  \"must\": [\n    {\"key\": \"success\", \"match\": {\"value\": true}}\n  ]\n}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -48
+      ],
+      "id": "34ddd3bd-9083-4168-a470-a407de1f4fdc",
+      "name": "Get successes",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "b76tCwD9rZH4XqAI",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.4-nano",
+          "mode": "list",
+          "cachedResultName": "GPT-5.4-NANO"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Your task is to summarize the positive and negative examples from past agent runs into a prompt that:\n1. Reports the original user question the agent has to research\n2. Reports what past failures and successes the agent has reported on similar queries, and what paths the agent took and should probably take now\n\nIf no previous negative/positive examples are reported, simply state: \"there are no previous runs that relate to a similar query\"."
+            },
+            {
+              "content": "=Original query:  {{ $('Webhook').item.json.body.message }}\n\nNegative examples:\n\n{{ JSON.stringify($('Get Failures').item.json.result.points[0], undefined, 2) }}\n\nPositive examples:\n\n{{ JSON.stringify($json.result.points, undefined, 2) }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        160,
+        -48
+      ],
+      "id": "65624605-c621-4b3c-a8f9-ba825976dfa8",
+      "name": "Summarize into agent prompt",
+      "credentials": {
+        "openAiApi": {
+          "id": "YYBF29uIUNq8L0oA",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output[0].content[0].text }}",
+        "options": {
+          "systemMessage": "You are tasked with researching information around the user's inquiry. Use the web_search_exa and web_fetch_exa tools to collect information from the web, and only answer directly if the question is trivial (as in \"what is 2+2\" or \"what is the chemical formula for water\").\nIf you do not manage to collect enough information from the web search, please report that to the user and do not give partial or unsupported/non-factual answers.",
+          "maxIterations": 5,
+          "returnIntermediateSteps": true,
+          "enableStreaming": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        496,
+        -48
+      ],
+      "id": "662b980c-3bb1-46e9-8b1e-5529cc6f3ecc",
+      "name": "Research Agent"
+    },
+    {
+      "parameters": {
+        "resource": "point",
+        "operation": "upsertPoints",
+        "collectionName": {
+          "__rl": true,
+          "value": "n8n-bot",
+          "mode": "list",
+          "cachedResultName": "n8n-bot"
+        },
+        "points": "=[\n    {\n        \"id\": \"{{ $('Webhook').item.json.body.request_id }}\",\n        \"payload\": {\n            \"success\": {{ $('Send message and wait for response').item.json.data[\"Did the agent response satisfy your original query?\"] === \"Yes\" }},\n            \"feedback\": {{ JSON.stringify($('Send message and wait for response').item.json.data['Please leave any feedback you might have on the agent\\'s answer']) }},\n            \"original_query\": {{ JSON.stringify($('Webhook').item.json.body.message) }},\n            \"agent_answer\": {{ JSON.stringify($('Research Agent').item.json.output) }},\n            \"agent_trace\": {{ JSON.stringify($('Research Agent').item.json.intermediateSteps) }}\n        },\n        \"vector\": {{ JSON.stringify($('Embed Query').item.json.data[0].embedding) }}\n    }\n]",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        -48
+      ],
+      "id": "cdeef802-0d61-4f74-860e-4d8756d7a8f8",
+      "name": "Update Collection with Feedback",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "b76tCwD9rZH4XqAI",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.request_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        592,
+        160
+      ],
+      "id": "29013777-cec9-4c2a-bdd9-cd9ca605905e",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Embed Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exa MCP": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "Update Collection with Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Failures": {
+      "main": [
+        [
+          {
+            "node": "Get successes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embed Query": {
+      "main": [
+        [
+          {
+            "node": "Get Failures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get successes": {
+      "main": [
+        [
+          {
+            "node": "Summarize into agent prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize into agent prompt": {
+      "main": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9b58b891-ebce-4398-8626-b64476409204",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d97d9964d1e28c3ba80d9f9c405ac2533852f648951c555a20b43e8dc67f5925"
+  },
+  "nodeGroups": [],
+  "id": "qyA9wpO9hx5f0shY",
+  "tags": []
+}
