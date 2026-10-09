@@ -41,6 +41,13 @@ def get_token() -> str:
         raise ValueError("Could not find a Discord bot token within the environment")
     return tok
 
+@lru_cache(maxsize=1)
+def get_webhook_key() -> str:
+    tok = os.getenv("N8N_WEBHOOK_AUTH_KEY")
+    if tok is None:
+        raise ValueError("Could not find the webhook auth token (N8N_WEBHOOK_AUTH_KEY) within the environment")
+    return tok
+
 
 bot = Client(intents=get_intents())
 
@@ -73,6 +80,7 @@ async def on_message(message: Message) -> None:
                     "mention": message.author.mention,
                     "request_id": req_id,
                 },
+                headers={"x-api-key": get_webhook_key()}
             )
             response.raise_for_status()
         return
@@ -107,5 +115,6 @@ def collection_main() -> None:
 
 
 def main() -> None:
+    get_webhook_key()
     token = get_token()
     bot.run(token)

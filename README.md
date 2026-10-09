@@ -5,7 +5,7 @@ A Discord bot that relays mentions to an [n8n](https://n8n.io/) workflow via web
 ## How it works
 
 1. The bot listens for messages that mention it.
-2. On a mention, it reacts with 👀, acknowledges the request with a tracking ID, and `POST`s the message content to an n8n webhook (`{"message", "mention", "request_id"}`).
+2. On a mention, it reacts with 👀, acknowledges the request with a tracking ID, and `POST`s the message content to an n8n webhook (`{"message", "mention", "request_id"}`), authenticated with an `x-api-key` header.
 3. The n8n workflow takes it from there (e.g. querying/updating the Qdrant collection created by this project) and reports back to the channel itself.
 
 ![Demo](./demo.gif)
@@ -41,13 +41,15 @@ A Discord bot that relays mentions to an [n8n](https://n8n.io/) workflow via web
    In your n8n instance, go to **Workflows → Import from File** and select `n8n-workflow.json`. Then:
 
    1. Reassign the credentials on each node (OpenAI, Exa, Discord, Qdrant) to your own accounts.
-   2. Activate the workflow and copy its **Webhook** node's production URL — this is your `N8N_WEBHOOK_ENDPOINT`.
+   2. Create a **Header Auth** credential (name: `x-api-key`, value: a secret of your choice) and assign it to the **Webhook** node. The same secret is your `N8N_WEBHOOK_AUTH_KEY`.
+   3. Activate the workflow and copy its **Webhook** node's production URL — this is your `N8N_WEBHOOK_ENDPOINT`.
 
 4. Create a `.env` file in the project root with:
 
    ```bash
    DISCORD_BOT_TOKEN=your-discord-bot-token
    N8N_WEBHOOK_ENDPOINT=https://your-n8n-instance/webhook/your-id
+   N8N_WEBHOOK_AUTH_KEY=your-webhook-header-auth-secret
    QDRANT_URL=https://your-qdrant-instance
    QDRANT_API_KEY=your-qdrant-api-key   # optional, if your instance requires it
    ```

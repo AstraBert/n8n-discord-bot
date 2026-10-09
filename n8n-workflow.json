@@ -5,17 +5,24 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "40dda4c5-bab5-4e10-b12f-0cbc998d5e35",
+        "authentication": "headerAuth",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -560,
-        -48
+        0,
+        0
       ],
-      "id": "665e2622-4dc2-4b4f-85fd-a10fa98021fa",
+      "id": "322def1d-34fe-4462-93ca-53e4d35c6409",
       "name": "Webhook",
-      "webhookId": "40dda4c5-bab5-4e10-b12f-0cbc998d5e35"
+      "webhookId": "40dda4c5-bab5-4e10-b12f-0cbc998d5e35",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "0MGZ9ey8UPZ43Qpk",
+          "name": "Header Auth account 2"
+        }
+      }
     },
     {
       "parameters": {
@@ -31,36 +38,15 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        448,
-        160
+        1008,
+        208
       ],
-      "id": "b31b7594-f16e-4222-899a-90f2b83a8219",
+      "id": "79c3732f-953f-4fd7-a782-cd5fda42e4f1",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "YYBF29uIUNq8L0oA",
+          "id": "vQVEwKRArbEBMQLs",
           "name": "OpenAI account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "options": {
-          "timeout": 60000
-        }
-      },
-      "type": "@n8n/mcp-registry.exa",
-      "typeVersion": 1.1,
-      "position": [
-        720,
-        160
-      ],
-      "id": "92059b89-3b2b-4fcc-af09-c4c4515a0df6",
-      "name": "Exa MCP",
-      "credentials": {
-        "exaMcpOAuth2Api": {
-          "id": "0umBTplIgubQhLut",
-          "name": "Exa account"
         }
       }
     },
@@ -77,10 +63,10 @@
         },
         "channelId": {
           "__rl": true,
-          "value": "1536295572011614228",
+          "value": "1546844933883691048",
           "mode": "list",
-          "cachedResultName": "test-n8n",
-          "cachedResultUrl": "https://discord.com/channels/1229781627677442048/1536295572011614228"
+          "cachedResultName": "research-agent",
+          "cachedResultUrl": "https://discord.com/channels/1229781627677442048/1546844933883691048"
         },
         "message": "=Hey {{ $('Webhook').item.json.body.mention }}\n\nI finished task {{ $('Webhook').item.json.body.request_id }}!\n\nHere is your answer:\n\n{{ $json.output.length > 2000 ? $json.output.slice(0, 1995) + \"...\" : $json.output }}",
         "responseType": "customForm",
@@ -120,15 +106,15 @@
       "type": "n8n-nodes-base.discord",
       "typeVersion": 2,
       "position": [
-        816,
-        -48
+        1376,
+        0
       ],
-      "id": "f51f0d43-144a-4ef3-966b-d162a56e600a",
+      "id": "62b94308-21ad-4ddc-89c7-4c3a4e4a043f",
       "name": "Send message and wait for response",
       "webhookId": "c9c1f8b0-473c-4b2a-9314-883c390ca9f2",
       "credentials": {
         "discordBotApi": {
-          "id": "f5OK3p9t4iIgpWmm",
+          "id": "LuvYaWP5gXeZSWAG",
           "name": "Discord Bot account"
         }
       }
@@ -152,14 +138,14 @@
       "type": "n8n-nodes-qdrant.qdrant",
       "typeVersion": 1,
       "position": [
-        -224,
-        -48
+        336,
+        0
       ],
-      "id": "963e8a07-e05e-419d-909a-499cdb8add85",
+      "id": "34435625-0a28-4db0-a753-a0986ac18b8d",
       "name": "Get Failures",
       "credentials": {
         "qdrantRestApi": {
-          "id": "b76tCwD9rZH4XqAI",
+          "id": "iZYJd1D7fkO48GNf",
           "name": "Qdrant account"
         }
       }
@@ -188,14 +174,14 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        -368,
-        -48
+        192,
+        0
       ],
-      "id": "d6afc950-8bf5-4d9f-a086-4409e6a013d0",
+      "id": "c3b0d517-dc3a-4c61-9e51-1ded2c2e57d8",
       "name": "Embed Query",
       "credentials": {
         "openAiApi": {
-          "id": "YYBF29uIUNq8L0oA",
+          "id": "vQVEwKRArbEBMQLs",
           "name": "OpenAI account"
         }
       }
@@ -219,14 +205,14 @@
       "type": "n8n-nodes-qdrant.qdrant",
       "typeVersion": 1,
       "position": [
-        -64,
-        -48
+        496,
+        0
       ],
-      "id": "34ddd3bd-9083-4168-a470-a407de1f4fdc",
+      "id": "c9132718-5984-4a5e-a06f-cecf55a64d39",
       "name": "Get successes",
       "credentials": {
         "qdrantRestApi": {
-          "id": "b76tCwD9rZH4XqAI",
+          "id": "iZYJd1D7fkO48GNf",
           "name": "Qdrant account"
         }
       }
@@ -256,14 +242,14 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2.3,
       "position": [
-        160,
-        -48
+        720,
+        0
       ],
-      "id": "65624605-c621-4b3c-a8f9-ba825976dfa8",
+      "id": "a6d1505a-a412-4d46-9440-9ae41f225ea2",
       "name": "Summarize into agent prompt",
       "credentials": {
         "openAiApi": {
-          "id": "YYBF29uIUNq8L0oA",
+          "id": "vQVEwKRArbEBMQLs",
           "name": "OpenAI account"
         }
       }
@@ -282,10 +268,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        496,
-        -48
+        1056,
+        0
       ],
-      "id": "662b980c-3bb1-46e9-8b1e-5529cc6f3ecc",
+      "id": "709d0bbf-2312-406a-96e8-6bb8606e2ed4",
       "name": "Research Agent"
     },
     {
@@ -304,14 +290,14 @@
       "type": "n8n-nodes-qdrant.qdrant",
       "typeVersion": 1,
       "position": [
-        1024,
-        -48
+        1584,
+        0
       ],
-      "id": "cdeef802-0d61-4f74-860e-4d8756d7a8f8",
+      "id": "5a02e2c6-b7fe-4e92-acff-e9a6cc61be30",
       "name": "Update Collection with Feedback",
       "credentials": {
         "qdrantRestApi": {
-          "id": "b76tCwD9rZH4XqAI",
+          "id": "iZYJd1D7fkO48GNf",
           "name": "Qdrant account"
         }
       }
@@ -324,11 +310,32 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.4,
       "position": [
-        592,
-        160
+        1152,
+        208
       ],
-      "id": "29013777-cec9-4c2a-bdd9-cd9ca605905e",
+      "id": "4aa82aa6-b532-4751-b7a9-d146ffeba5b3",
       "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://mcp.exa.ai/mcp",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.4,
+      "position": [
+        1264,
+        208
+      ],
+      "id": "012021bb-8378-4d7b-ad2d-02d4427be373",
+      "name": "Exa MCP",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "nPbPqrw9yOKOOT0k",
+          "name": "Header Auth account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -350,17 +357,6 @@
           {
             "node": "Research Agent",
             "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Exa MCP": {
-      "ai_tool": [
-        [
-          {
-            "node": "Research Agent",
-            "type": "ai_tool",
             "index": 0
           }
         ]
@@ -442,20 +438,30 @@
           }
         ]
       ]
+    },
+    "Exa MCP": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate",
-    "availableInMCP": false
+    "binaryMode": "separate"
   },
-  "versionId": "9b58b891-ebce-4398-8626-b64476409204",
+  "versionId": "176f39a6-2b06-44a2-8049-777c6fd9737d",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "d97d9964d1e28c3ba80d9f9c405ac2533852f648951c555a20b43e8dc67f5925"
+    "instanceId": "4605c50867df2cbffe617264cbd1912261d89b460cbc5ebfb5c819b818a4e58f"
   },
   "nodeGroups": [],
-  "id": "qyA9wpO9hx5f0shY",
+  "id": "tspuqAD9JZBZaTZT",
   "tags": []
 }
