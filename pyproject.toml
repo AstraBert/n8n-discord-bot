@@ -2,7 +2,6 @@
 name = "n8n-discord-bot"
 version = "0.1.0"
 description = "Add your description here"
-readme = "README.md"
 authors = [
     { email = "astraberte9@gmail.com" }
 ]
@@ -10,7 +9,6 @@ requires-python = ">=3.14"
 dependencies = [
     "discord-py>=2.7.1",
     "httpx>=0.28.1",
-    "qdrant-client>=1.19.0",
 ]
 
 [project.scripts]
@@ -23,6 +21,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "qdrant-client>=1.19.1",
     "ruff>=0.16.2",
     "ty>=0.0.69",
 ]

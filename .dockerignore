@@ -1,0 +1,9 @@
+demo.gif
+jakefile.toml
+n8n-workflow.json
+.venv/
+.ruff_cache/
+__pycache__/
+.env
+README.md
+LICENSE

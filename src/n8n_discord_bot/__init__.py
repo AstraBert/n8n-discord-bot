@@ -1,21 +1,36 @@
+from __future__ import annotations
+
 import asyncio
 import logging
 import os
 import uuid
 from functools import lru_cache
+from types import ModuleType
+from typing import TYPE_CHECKING, Any, Literal
 
 import httpx
 from discord import Client, Intents, Message
-from qdrant_client import AsyncQdrantClient, models
+
+if TYPE_CHECKING:
+    from qdrant_client import AsyncQdrantClient
 
 logger = logging.getLogger(__name__)
 
-QDRANT_COLLECTION_NAME = "n8n-bot"
-QDRANT_COLLECTION_DIMS = 1536
-QDRANT_COLLECTION_PAYLOAD_INDEXES = [
-    ("feedback", models.PayloadSchemaType.TEXT),
-    ("success", models.PayloadSchemaType.BOOL),
-]
+
+def qdrant_setup() -> tuple[
+    list[tuple[str, Any]], Literal["n8n-bot"], Literal[1536], ModuleType
+]:
+    from qdrant_client import models
+
+    return (
+        [
+            ("feedback", models.PayloadSchemaType.TEXT),
+            ("success", models.PayloadSchemaType.BOOL),
+        ],
+        "n8n-bot",
+        1536,
+        models,
+    )
 
 
 @lru_cache(maxsize=1)
@@ -41,11 +56,14 @@ def get_token() -> str:
         raise ValueError("Could not find a Discord bot token within the environment")
     return tok
 
+
 @lru_cache(maxsize=1)
 def get_webhook_key() -> str:
     tok = os.getenv("N8N_WEBHOOK_AUTH_KEY")
     if tok is None:
-        raise ValueError("Could not find the webhook auth token (N8N_WEBHOOK_AUTH_KEY) within the environment")
+        raise ValueError(
+            "Could not find the webhook auth token (N8N_WEBHOOK_AUTH_KEY) within the environment"
+        )
     return tok
 
 
@@ -80,7 +98,7 @@ async def on_message(message: Message) -> None:
                     "mention": message.author.mention,
                     "request_id": req_id,
                 },
-                headers={"x-api-key": get_webhook_key()}
+                headers={"x-api-key": get_webhook_key()},
             )
             response.raise_for_status()
         return
@@ -88,6 +106,8 @@ async def on_message(message: Message) -> None:
 
 @lru_cache(maxsize=1)
 def get_qdrant_client() -> AsyncQdrantClient:
+    from qdrant_client import AsyncQdrantClient
+
     url = os.getenv("QDRANT_URL")
     if url is None:
         raise ValueError("Could not find a Qdrant base URL within the environment")
@@ -96,16 +116,17 @@ def get_qdrant_client() -> AsyncQdrantClient:
 
 
 async def create_collection() -> None:
+    payload_indexes, collection_name, collection_dims, models = qdrant_setup()
     client = get_qdrant_client()
     await client.create_collection(
-        collection_name=QDRANT_COLLECTION_NAME,
+        collection_name=collection_name,
         vectors_config=models.VectorParams(
-            distance=models.Distance.COSINE, size=QDRANT_COLLECTION_DIMS
+            distance=models.Distance.COSINE, size=collection_dims
         ),
     )
-    for f, t in QDRANT_COLLECTION_PAYLOAD_INDEXES:
+    for f, t in payload_indexes:
         await client.create_payload_index(
-            collection_name=QDRANT_COLLECTION_NAME, field_name=f, field_type=t
+            collection_name=collection_name, field_name=f, field_type=t
         )
     print("Successfully created collection on Qdrant")
 
